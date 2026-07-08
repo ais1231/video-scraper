@@ -135,16 +135,16 @@ def _format_eta(eta: int) -> str:
 
 
 
+SUPPORTED_PLATFORMS = {"youtube": "YouTube", "twitter": "Twitter/X", "x": "Twitter/X", "bilibili": "Bilibili"}
+
+
 def get_extractor_name(url: str) -> str:
-    """从 URL 猜测网站名（用于显示）"""
+    """从 URL 判断平台，仅支持 YouTube / Twitter(X) / Bilibili"""
     url_lower = url.lower()
-    if "youtube.com" in url_lower or "youtu.be" in url_lower:
-        return "YouTube"
-    if "twitter.com" in url_lower or "x.com" in url_lower:
-        return "Twitter/X"
-    if "bilibili.com" in url_lower or "b23.tv" in url_lower:
-        return "Bilibili"
-    return "Video"
+    for key, name in SUPPORTED_PLATFORMS.items():
+        if key + ".com" in url_lower or (key == "youtube" and "youtu.be" in url_lower) or (key == "bilibili" and "b23.tv" in url_lower):
+            return name
+    return ""  # 不支持的平台
 
 
 def download_video(url: str, config: dict, output_dir: str = "") -> dict:
@@ -160,6 +160,13 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
         dict: {"status": "completed"|"error", "title": str, "url": str, "error_msg": str}
     """
     site_name = get_extractor_name(url)
+    if not site_name:
+        return {
+            "url": url, "title": "", "site": "Unsupported",
+            "status": "error",
+            "error_msg": "仅支持 YouTube / Twitter(X) / Bilibili 三个平台",
+            "filepath": "", "time": datetime.now().isoformat(),
+        }
 
     # 构建输出模板
     # 优先级: --output CLI 参数 > config.download_dir > config.output_template
@@ -290,6 +297,8 @@ def main():
     parser.add_argument("--force", action="store_true", help="强制重新下载（跳过历史检查）")
 
     args = parser.parse_args()
+
+    print("[Video Scraper] 设计用于夸克浏览器 · 仅支持 YouTube / Twitter(X) / Bilibili")
 
     # 收集所有 URL
     urls = list(args.urls)

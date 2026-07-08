@@ -8,6 +8,11 @@ build/
 # Project
 downloads/
 history.json
+cookies.txt
+export_cookies.py
+
+# User commands
+commands.txt
 
 # IDE
 .vscode/

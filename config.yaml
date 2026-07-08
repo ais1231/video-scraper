@@ -9,8 +9,8 @@ download_dir: ""
 # 下载输出路径（当 download_dir 为空时生效，支持 yt-dlp 输出模板变量）
 output_template: "downloads/%(extractor)s/%(title)s.%(ext)s"
 
-# ffmpeg 路径（留空则从 PATH 自动寻找）
-ffmpeg_location: "C:\\Users\\csh\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-essentials_build\\bin\\ffmpeg.exe"
+# ffmpeg 路径（留空则从 PATH 自动寻找，一般不需要改）
+ffmpeg_location: ""
 
 # Cookie 文件（已通过 export_cookies.py 导出，夸克开着时也有效）
 # 如果 Cookie 过期，重新运行: python export_cookies.py

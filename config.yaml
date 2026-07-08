@@ -23,7 +23,7 @@ cookies_from_browser: ""
 proxy: ""
 
 # 下载并发数
-concurrent_fragments: 1
+concurrent_fragments: 5
 
 # 重试次数
 retries: 10

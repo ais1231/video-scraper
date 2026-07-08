@@ -31,7 +31,7 @@ def load_config(config_path: str = "") -> dict:
         "cookies_file": "",
         "cookies_from_browser": "",
         "proxy": "",
-        "concurrent_fragments": 1,
+        "concurrent_fragments": 5,
         "retries": 10,
     }
 
@@ -199,7 +199,7 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
         "progress_hooks": [progress_hook(site_name)],
         "retries": config.get("retries", 10),
         "fragment_retries": config.get("retries", 10),
-        "concurrent_fragments": config.get("concurrent_fragments", 1),
+        "concurrent_fragments": config.get("concurrent_fragments", 5),
         "quiet": True,
         "no_warnings": True,
         "extract_flat": False,
@@ -298,8 +298,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("[Video Scraper] 设计用于夸克浏览器 · 仅支持 YouTube / Twitter(X) / Bilibili")
-    print("[Vibe Coded] 懒得折腾其他网站，怕有bug，想加站点自行改代码")
+    print("[Video Scraper] 夸克浏览器专用 · 仅支持 YouTube / Twitter(X) / Bilibili")
 
     # 收集所有 URL
     urls = list(args.urls)

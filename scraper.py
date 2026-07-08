@@ -299,6 +299,7 @@ def main():
     args = parser.parse_args()
 
     print("[Video Scraper] 设计用于夸克浏览器 · 仅支持 YouTube / Twitter(X) / Bilibili")
+    print("[Vibe Coded] 懒得折腾其他网站，怕有bug，想加站点自行改代码")
 
     # 收集所有 URL
     urls = list(args.urls)

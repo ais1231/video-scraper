@@ -82,3 +82,9 @@ downloads/
 ├── twitter/
 └── bilibili/
 ```
+
+---
+
+> 本仓库所有代码由 [Vibe Coding](https://en.wikipedia.org/wiki/Vibe_coding) 完成，
+> 懒得折腾其他网站，怕又有 bug。
+> 如果想尝试新增站点，自行修改代码，后果自负。

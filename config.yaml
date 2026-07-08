@@ -19,8 +19,8 @@ cookies_file: ""
 # 自动从浏览器提取 Cookie（优先于 cookies_file）
 # 可选值: chrome, chromium, brave, firefox, edge, opera, safari, 或留空禁用
 # 用 :: 指定浏览器数据目录路径
-# 下 Twitter/Bilibili 前先关掉夸克浏览器，再取消注释下面这行:
-# cookies_from_browser: "chrome::C:\\Users\\csh\\AppData\\Local\\Quark\\User Data"
+# 夸克开着时程序会自动跳过 Cookie（不崩），关掉夸克后自动使用 Cookie
+cookies_from_browser: "chrome::C:\\Users\\csh\\AppData\\Local\\Quark\\User Data"
 
 # 代理设置（可选，如 http://127.0.0.1:7890）
 proxy: ""

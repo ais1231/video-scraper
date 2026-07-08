@@ -133,6 +133,24 @@ def _format_eta(eta: int) -> str:
     return f"{eta}s"
 
 
+def is_browser_running(browser_path: str = "") -> bool:
+    """Check if browser process is running (cookie DB may be locked)"""
+    import subprocess
+    hints = []
+    if "quark" in browser_path.lower():
+        hints.append("quark")
+    if not hints:
+        hints = ["chrome", "chromium", "firefox", "edge", "opera", "brave"]
+    try:
+        r = subprocess.run(
+            ["tasklist", "/FI", f"IMAGENAME eq {hints[0]}.exe", "/NH"],
+            capture_output=True, text=True, timeout=3
+        )
+        return hints[0] in r.stdout.lower()
+    except Exception:
+        return False
+
+
 def get_extractor_name(url: str) -> str:
     """从 URL 猜测网站名（用于显示）"""
     url_lower = url.lower()
@@ -203,25 +221,21 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
         ydl_opts["cookiefile"] = config["cookies_file"]
     if config.get("cookies_from_browser"):
         cf_browser = config["cookies_from_browser"]
-        # 支持 chrome::path 格式 → 解析为元组
-        if "::" in cf_browser:
-            parts = cf_browser.split("::", 1)
-            ydl_opts["cookiesfrombrowser"] = (parts[0], parts[1])
+        # 提取浏览器路径用于检测进程
+        browser_path = cf_browser.split("::", 1)[1] if "::" in cf_browser else cf_browser
+        if is_browser_running(browser_path):
+            # 浏览器开着时 Cookie 数据库被锁，跳过 Cookie 认证
+            if site_name in ("Twitter/X", "Bilibili"):
+                print(f"[Info] {site_name} 需要 Cookie 认证，但夸克浏览器正在运行")
+                print(f"[Info] 关闭夸克后重新运行即可自动使用 Cookie")
         else:
-            ydl_opts["cookiesfrombrowser"] = (cf_browser,)
+            if "::" in cf_browser:
+                parts = cf_browser.split("::", 1)
+                ydl_opts["cookiesfrombrowser"] = (parts[0], parts[1])
+            else:
+                ydl_opts["cookiesfrombrowser"] = (cf_browser,)
     if config.get("proxy"):
         ydl_opts["proxy"] = config["proxy"]
-
-    # 如果 Cookie 初始化失败则不用 Cookie 重试
-    def _create_ydl(opts):
-        try:
-            return yt_dlp.YoutubeDL(opts)
-        except Exception as e:
-            if "cookie" in str(e).lower():
-                for k in ("cookiesfrombrowser", "cookiefile"):
-                    opts.pop(k, None)
-                return yt_dlp.YoutubeDL(opts)
-            raise
 
     result = {
         "url": url,
@@ -234,7 +248,7 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
     }
 
     try:
-        with _create_ydl(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             print(f"\n[Fetching] {site_name} video info: {url}")
 
             # 获取视频信息
@@ -333,6 +347,7 @@ def main():
     # 逐个下载
     success_count = 0
     fail_count = 0
+    current_errors = []  # 仅记录本次运行的错误
 
     for i, url in enumerate(urls, 1):
         print(f"\n{'='*60}")
@@ -352,6 +367,7 @@ def main():
             success_count += 1
         else:
             fail_count += 1
+            current_errors.append(result)
 
         print(f"{'='*60}")
 
@@ -366,9 +382,8 @@ def main():
     print(f"   [FAIL] Failed: {fail_count}")
     if fail_count > 0:
         print(f"\n失败的 URL:")
-        for entry in history:
-            if entry.get("status") == "error":
-                print(f"   [FAIL] {entry['url']}: {entry.get('error_msg', '')}")
+        for entry in current_errors:
+            print(f"   [FAIL] {entry['url']}: {entry.get('error_msg', '')}")
 
     sys.exit(0 if fail_count == 0 else 1)
 

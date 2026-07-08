@@ -278,7 +278,7 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Video Scraper — 网页视频下载工具",
+        description="夸克视频下载器 · 仅支持 YouTube / Twitter(X) / Bilibili",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:

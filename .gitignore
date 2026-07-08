@@ -9,10 +9,8 @@ build/
 downloads/
 history.json
 cookies.txt
-export_cookies.py
-
-# User commands
-commands.txt
+!tools/export_cookies.py
+!tools/commands.txt
 
 # IDE
 .vscode/

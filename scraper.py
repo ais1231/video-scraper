@@ -177,9 +177,9 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
     else:
         output_template = config.get("output_template", "downloads/%(extractor)s/%(title)s.%(ext)s")
 
-    # 确保输出目录存在
+    # 确保输出目录存在（跳过含模板变量的路径，yt-dlp 会自己创建）
     out_dir = Path(output_template).parent
-    if str(out_dir) != ".":
+    if str(out_dir) != "." and "%(" not in str(out_dir):
         os.makedirs(out_dir, exist_ok=True)
 
     # yt-dlp 选项

@@ -1,0 +1,38 @@
+==================  Video Scraper 常用命令  ==================
+
+* 每次打开新终端，先进入项目目录：
+    Windows 终端：  cd E:\video-scraper
+    CMD 终端：     cd /d E:\video-scraper
+
+
+[1] 下载 YouTube 视频
+    python scraper.py https://www.youtube.com/watch?v=视频ID
+
+
+[2] 下载 Twitter/X 视频（先关掉夸克浏览器）
+    python scraper.py https://x.com/用户名/status/帖子ID
+
+
+[3] 下载 Bilibili 视频（先关掉夸克浏览器）
+    python scraper.py https://www.bilibili.com/video/BV号
+
+
+[4] 批量下载（从文件读取 URL）
+    python scraper.py --urls-file urls.txt
+
+
+[5] 下载到指定目录
+    python scraper.py --output D:\我的视频 https://www.youtube.com/watch?v=视频ID
+
+
+[6] 强制重新下载（跳过历史记录）
+    python scraper.py --force https://www.youtube.com/watch?v=视频ID
+
+
+[7] 查看帮助
+    python scraper.py --help
+
+
+=========================================================
+
+下载的文件在：  E:\video-scraper\downloads\站点名\

@@ -25,12 +25,13 @@ import yt_dlp
 def load_config(config_path: str = "") -> dict:
     """加载配置文件，返回配置字典"""
     default_config = {
+        "download_dir": "",
         "output_template": "downloads/%(extractor)s/%(title)s.%(ext)s",
         "ffmpeg_location": "",
         "cookies_file": "",
         "cookies_from_browser": "",
         "proxy": "",
-        "concurrent_fragments": 3,
+        "concurrent_fragments": 1,
         "retries": 10,
     }
 
@@ -159,8 +160,11 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
     site_name = get_extractor_name(url)
 
     # 构建输出模板
+    # 优先级: --output CLI 参数 > config.download_dir > config.output_template
     if output_dir:
         output_template = os.path.join(output_dir, "%(extractor)s", "%(title)s.%(ext)s")
+    elif config.get("download_dir"):
+        output_template = os.path.join(config["download_dir"], "%(extractor)s", "%(title)s.%(ext)s")
     else:
         output_template = config.get("output_template", "downloads/%(extractor)s/%(title)s.%(ext)s")
 
@@ -208,6 +212,17 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
     if config.get("proxy"):
         ydl_opts["proxy"] = config["proxy"]
 
+    # 如果 Cookie 初始化失败则不用 Cookie 重试
+    def _create_ydl(opts):
+        try:
+            return yt_dlp.YoutubeDL(opts)
+        except Exception as e:
+            if "cookie" in str(e).lower():
+                for k in ("cookiesfrombrowser", "cookiefile"):
+                    opts.pop(k, None)
+                return yt_dlp.YoutubeDL(opts)
+            raise
+
     result = {
         "url": url,
         "title": "",
@@ -219,7 +234,7 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
     }
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with _create_ydl(ydl_opts) as ydl:
             print(f"\n[Fetching] {site_name} video info: {url}")
 
             # 获取视频信息

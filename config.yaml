@@ -1,0 +1,26 @@
+# Video Scraper 配置
+# 按需修改以下配置项
+
+# 下载输出路径（支持 yt-dlp 输出模板变量）
+output_template: "downloads/%(extractor)s/%(title)s.%(ext)s"
+
+# ffmpeg 路径（留空则从 PATH 自动寻找）
+ffmpeg_location: "C:\\Users\\csh\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-essentials_build\\bin\\ffmpeg.exe"
+
+# Cookie 文件路径（可选，用于访问需要登录的站点的视频）
+# 可从浏览器导出 Netscape 格式的 cookie 文件
+cookies_file: ""
+
+# 自动从浏览器提取 Cookie（优先于 cookies_file）
+# 可选值: chrome, chromium, brave, firefox, edge, opera, safari, 或留空禁用
+# 用 :: 指定浏览器数据目录路径（夸克用下面这个）
+cookies_from_browser: "chrome::C:\\Users\\csh\\AppData\\Local\\Quark\\User Data"
+
+# 代理设置（可选，如 http://127.0.0.1:7890）
+proxy: ""
+
+# 下载并发数
+concurrent_fragments: 1
+
+# 重试次数
+retries: 10

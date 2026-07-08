@@ -133,6 +133,31 @@ def _format_eta(eta: int) -> str:
     return f"{eta}s"
 
 
+def _find_ffmpeg() -> str:
+    """自动探测 ffmpeg 路径"""
+    import shutil
+    # 1. PATH 里找
+    which = shutil.which("ffmpeg")
+    if which:
+        return which
+    # 2. 用户目录下的 winget 安装
+    user = os.path.expanduser("~")
+    winget_path = os.path.join(user, "AppData", "Local", "Microsoft", "WinGet", "Packages")
+    if os.path.isdir(winget_path):
+        for root, dirs, files in os.walk(winget_path):
+            if "ffmpeg.exe" in files:
+                return os.path.join(root, "ffmpeg.exe")
+    # 3. 常见安装位置
+    common = [
+        r"C:\ffmpeg\bin\ffmpeg.exe",
+        r"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
+    ]
+    for p in common:
+        if os.path.exists(p):
+            return p
+    return ""
+
+
 
 
 SUPPORTED_PLATFORMS = {"youtube": "YouTube", "twitter": "Twitter/X", "x": "Twitter/X", "bilibili": "Bilibili"}
@@ -206,8 +231,9 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
     }
 
     # 可选配置
-    if config.get("ffmpeg_location"):
-        ydl_opts["ffmpeg_location"] = config["ffmpeg_location"]
+    ffmpeg_path = config.get("ffmpeg_location") or _find_ffmpeg()
+    if ffmpeg_path:
+        ydl_opts["ffmpeg_location"] = ffmpeg_path
     if config.get("cookies_file"):
         ydl_opts["cookiefile"] = config["cookies_file"]
     if config.get("cookies_from_browser"):

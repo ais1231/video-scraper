@@ -133,22 +133,6 @@ def _format_eta(eta: int) -> str:
     return f"{eta}s"
 
 
-def is_browser_running(browser_path: str = "") -> bool:
-    """Check if browser process is running (cookie DB may be locked)"""
-    import subprocess
-    hints = []
-    if "quark" in browser_path.lower():
-        hints.append("quark")
-    if not hints:
-        hints = ["chrome", "chromium", "firefox", "edge", "opera", "brave"]
-    try:
-        r = subprocess.run(
-            ["tasklist", "/FI", f"IMAGENAME eq {hints[0]}.exe", "/NH"],
-            capture_output=True, text=True, timeout=3
-        )
-        return hints[0] in r.stdout.lower()
-    except Exception:
-        return False
 
 
 def get_extractor_name(url: str) -> str:
@@ -221,19 +205,11 @@ def download_video(url: str, config: dict, output_dir: str = "") -> dict:
         ydl_opts["cookiefile"] = config["cookies_file"]
     if config.get("cookies_from_browser"):
         cf_browser = config["cookies_from_browser"]
-        # 提取浏览器路径用于检测进程
-        browser_path = cf_browser.split("::", 1)[1] if "::" in cf_browser else cf_browser
-        if is_browser_running(browser_path):
-            # 浏览器开着时 Cookie 数据库被锁，跳过 Cookie 认证
-            if site_name in ("Twitter/X", "Bilibili"):
-                print(f"[Info] {site_name} 需要 Cookie 认证，但夸克浏览器正在运行")
-                print(f"[Info] 关闭夸克后重新运行即可自动使用 Cookie")
+        if "::" in cf_browser:
+            parts = cf_browser.split("::", 1)
+            ydl_opts["cookiesfrombrowser"] = (parts[0], parts[1])
         else:
-            if "::" in cf_browser:
-                parts = cf_browser.split("::", 1)
-                ydl_opts["cookiesfrombrowser"] = (parts[0], parts[1])
-            else:
-                ydl_opts["cookiesfrombrowser"] = (cf_browser,)
+            ydl_opts["cookiesfrombrowser"] = (cf_browser,)
     if config.get("proxy"):
         ydl_opts["proxy"] = config["proxy"]
 
